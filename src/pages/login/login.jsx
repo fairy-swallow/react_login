@@ -6,7 +6,7 @@ import { saveUser } from "./../../utils/storageUtil";
 import { reqLogin } from './../../api'
 
 import './login.less'
-import logo from './images/logo.png'
+import logo from './../../assets/images/logo.png'
 import memoryUtil from "../../utils/memoryUtil";
 
 
