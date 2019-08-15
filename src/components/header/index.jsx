@@ -88,7 +88,8 @@ class Header extends Component {
         const user = memoryUtil.user
         return (
             <div className='header'>
-                <div className='header-top'>欢迎, {user.username}
+                <div className='header-top'>
+                    <span>欢迎, {user.username}</span>
                     {/* <button>退出</button> */}
                     <ButtonLink onClick={this.logout}>退出</ButtonLink>
                 </div>

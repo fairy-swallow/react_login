@@ -32,3 +32,25 @@ export const reqWeather = (city) =>{
         })
     })
 }
+
+// 获取分类列表(ajax)--get
+// export const reqCategoryList = () => ajax.get('/manage/category/list')    //法一
+/* export const reqCategoryList = () => ajax({   //法二
+    url: '/manage/category/list',
+    method: 'GET'
+}) */
+export const reqCategoryList = () => ajax('/manage/category/list')    //法三
+
+// 添加分类(ajax)---post
+export const reqAddCategory = (categoryName) => ajax.post('/manage/category/add',{categoryName})
+
+// 修改分类(ajax)---post
+export const reqUpdateCategory = (categoryId,categoryName) => ajax.post('/manage/category/update',{categoryId,categoryName})
+
+// 获取商品分页列表(ajax)---get
+export const reqGetProduct = (pageNum, pageSize) => ajax('/manage/product/list',{
+    params:{
+       pageNum,
+       pageSize
+    }
+})
