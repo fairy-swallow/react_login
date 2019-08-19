@@ -130,6 +130,7 @@ export default class Role extends Component {
           rowKey='_id'
           columns={this.columns}
           dataSource={roles}
+          pagination={{ defaultPageSize: 2, showQuickJumper: true}}
         />
         <Modal
           title='添加角色'
