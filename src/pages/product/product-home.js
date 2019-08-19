@@ -1,5 +1,8 @@
 import React, { Component } from 'react'
 import { Select, Input, Button, Icon, Card, Table, message } from "antd";
+// import _ from 'lodash'
+import throttle from "lodash.throttle";    //节流
+// import debounce from "lodash.debounce";    //防抖
 
 import ButtonLink from "./../../components/button-link/buttonLink";
 import { reqGetProduct,reqUpDownShelf, reqSearchProduct } from './../../api'
@@ -66,8 +69,10 @@ export default class ProductHome extends Component {
               }>详情</ButtonLink>
               <ButtonLink onClick={()=>
                 {
+                  // console.log(product)
                   memoryUtil.product = product
-                  this.props.history.push('/product/addupdate')
+                  // 传product可以通过this.props.location.state获取此product对象，但注意，此种传值方法不支持HashRouter，只支持BrowserRouter
+                  this.props.history.push('/product/addupdate',product)
                 }
               }>修改</ButtonLink>
             </div>
@@ -78,7 +83,10 @@ export default class ProductHome extends Component {
   }
 
   // 更新上下架信息
-  updateShelfState = async (product) => {
+  // _.throttle ---- _:lodash库， throttle：是其身上的组件模块方法---节流，在2秒之内不能多次发送请求
+  // updateShelfState = _.throttle(async (product) => {     //两种引入方法
+  // updateShelfState = debounce(async (product) => {   //不用写{trailing: false}，第一次回调在2秒之后，在这里不适用
+  updateShelfState = throttle(async (product) => {
     const productId = product._id
     const status = product.status === 1 ? 2 : 1
     const result = await reqUpDownShelf(productId, status)
@@ -86,7 +94,9 @@ export default class ProductHome extends Component {
       message.success('更新商品状态成功')
       this.getProductData(this.pageNum)
     }
-  }
+  },2000,{ 
+    trailing: false     //第三个参数是节流的配置对象：其中trailing表示节流结束后调用回调函数，
+   })                   //默认为true，在节流第一回调一次，最后一次回调一次
 
   // 异步发送请求获取商品数据
   getProductData = async(pageNum)=>{
@@ -95,12 +105,12 @@ export default class ProductHome extends Component {
     const { searchType, searchContent } = this.state
     
     let result
-      if (!searchContent) {
-        // 发送请求--获取商品数据
-        result = await reqGetProduct(pageNum, PAGE_SIZE)
-      }else{
+      if (searchContent && this.isSearch) {
         // 发送请求--搜索商品获取商品数据显示页面
         result = await reqSearchProduct({ pageNum,pageSize:PAGE_SIZE,searchType,searchContent })
+      }else{
+        // 发送请求--获取商品数据
+        result = await reqGetProduct(pageNum, PAGE_SIZE)
       } 
       if (result.status === 0) {
         this.setState({
@@ -136,7 +146,10 @@ export default class ProductHome extends Component {
             style={{ width:200, margin:'0 10px' }} 
             onChange={(event)=> this.setState({ searchContent: event.target.value })}
           />
-          <Button type='primary' onClick={()=> this.getProductData(1)} >搜索</Button>
+          <Button type='primary' onClick={()=> {
+            this.isSearch = true
+            this.getProductData(1)
+          }} >搜索</Button>
       </span>
     )
     // 定义card的header右侧

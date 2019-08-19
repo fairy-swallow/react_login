@@ -80,41 +80,22 @@ export const reqCategoryNameById = (categoryId) => ajax.get('/manage/category/in
     }
 })
 
-// 添加商品(ajax)---post
-export const reqAddProduct = ({
-        categoryId,
-        name,
-        desc,
-        price,
-        detail,
-        imgs
-    }) => ajax.post('/manage/product/add', {
-    categoryId,    //分类ID
-    name,          //商品名称
-    desc,          //商品描述
-    price,         //商品价格
-    detail,        //商品详情
-    imgs           //商品图片名数组
-})
-
 // 更新商品(ajax)---post
-export const reqUpdateProduct = ( {
-    _id,
-    categoryId,
-    name,
-    desc,
-    price,
-    detail,
-    imgs
-} ) => ajax.post('/manage/product/update',{
-    _id,           //商品ID
-    categoryId,    //分类ID
-    name,          //商品名称
-    desc,          //商品描述
-    price,         //商品价格
-    detail,        //商品详情
-    imgs           //商品图片名数组
-})
+// _id, //商品ID       ----更新商品有，添加没有，其他都一样
+// categoryId, //分类ID
+// name, //商品名称
+// desc, //商品描述
+// price, //商品价格
+// detail, //商品详情
+// imgs //商品图片名数组
+// export const reqUpdateProduct = ( product ) => ajax.post('/manage/product/update',{product})
+// 添加商品(ajax)---post
+// export const reqAddProduct = (product) => ajax.post('/manage/product/add', {product})
+// 添加或更新商品请求---合为一个请求
+export const reqAddUpdateProduct = (product) => ajax.post(
+    '/manage/product/' + (product._id ? 'update' : 'add'), 
+    product
+)
 
 /* 
 上传图片(在pictureWall中请求) -- - 
@@ -124,3 +105,21 @@ url地址  (action = "/manage/img/upload")
 
 // 删除图片(ajax)---post --- name 图片文件名
 export const reqDelPicture = (name) => ajax.post('/manage/img/delete',{name})
+
+// 获取角色列表(ajax)---get
+export const reqgetRole = () => ajax.get('/manage/role/list')
+
+// 添加角色(ajax)---post
+export const reqAddRole = (roleName) => ajax.post('/manage/role/add',{roleName})
+
+// 更新角色(ajax)---post---参数role是个含(_id,menus,auth_name,auth_time)的对象
+export const reqUpdateRole = (role) => ajax.post('/manage/role/update',role)
+
+// 获取所有用户列表(ajax)---get
+export const reqAllUsers = () => ajax('/manage/user/list')
+
+// 添加或更新用户(ajax)---post---参数user是个对象
+export const reqAddOrUpdateUser = (user) => ajax.post('/manage/user/' + (user._id ? 'update' : 'add'), user)
+
+// 删除用户(ajax)---post---参数userId表示用户id
+export const reqRemoveUser = (userId) => ajax.post('/manage/user/delete',{userId})

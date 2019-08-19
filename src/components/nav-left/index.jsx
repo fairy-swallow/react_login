@@ -4,43 +4,62 @@ import { Link,withRouter } from "react-router-dom";
 
 import mnueList from "./../../config/menuconfig";
 import logo from "./../../assets/images/logo.png";
+import memoryUtil from "./../../utils/memoryUtil";
 import "./nav-left.less";
 
 const { SubMenu, Item } = Menu
 
 class NavLeft extends Component {
 
+    hasAuth= (item)=>{
+        const user = memoryUtil.user
+        const menus = user.role.menus
+        // 1.判断用户是否为admin
+        // 2.判断menuList中是否isPublic为true
+        // 3.判断menus中是否有菜单项
+        if (user.username === 'admin' || item.isPublic || menus.indexOf(item.key) !=-1) {
+            return true
+        }else if (item.children) {
+            const cItem = item.children.find(cItem => menus.indexOf(cItem.key) !=-1)
+            return !!cItem
+        }
+        return false
+    }
+
     // map方法遍历menuconfig文件中的menuList数组，根据数据实现标签组件化
     getMenuNodes = (mnueList) => {
         const path = this.props.location.pathname
         return mnueList.map(item => {
-            if (!item.children) {
-                return (
-                    <Item key={item.key}>
-                        <Link to={item.key}>
-                            <Icon type={item.icon} />
-                            <span>{item.title}</span>
-                        </Link>
-                    </Item>
-                )
-            } else {
-                const cItem = item.children.find(cItem => cItem.key === path)
-                if (cItem) {
-                    this.openKey = item.key
-                }
-                return (
-                    <SubMenu
-                        key={item.key}
-                        title={
-                            <span>
+            // 自定义一个方法hasAuth判断menu中是否含有菜单项，有则执行后续操作，显示权限显示菜单页面
+            if (this.hasAuth(item)) {
+                if (!item.children) {
+                    return (
+                        <Item key={item.key}>
+                            <Link to={item.key}>
                                 <Icon type={item.icon} />
                                 <span>{item.title}</span>
-                            </span>
-                        }
-                    >
-                        {this.getMenuNodes(item.children)}
-                    </SubMenu>
-                )
+                            </Link>
+                        </Item>
+                    )
+                } else {
+                    const cItem = item.children.find(cItem => cItem.key === path)
+                    if (cItem) {
+                        this.openKey = item.key
+                    }
+                    return (
+                        <SubMenu
+                            key={item.key}
+                            title={
+                                <span>
+                                    <Icon type={item.icon} />
+                                    <span>{item.title}</span>
+                                </span>
+                            }
+                        >
+                            {this.getMenuNodes(item.children)}
+                        </SubMenu>
+                    )
+                }
             }
         })
     }
@@ -49,35 +68,40 @@ class NavLeft extends Component {
     getMenuNodes2 = (mnueList) => {
         const path = this.props.location.pathname
         return mnueList.reduce((pre, item) => {
-            if (!item.children) {
-                pre.push(
-                    <Item key={item.key}>
-                        <Link to={item.key}>
-                            <Icon type={item.icon} />
-                            <span>{item.title}</span>
-                        </Link>
-                    </Item>
-                )
-            } else {
-                const cItem = item.children.find(cItem => cItem.key===path)
-                if (cItem) {
-                    this.openKey = item.key
-                }
-                pre.push(
-                    <SubMenu
-                        key={item.key}
-                        title={
-                            <span>
+            // 自定义一个方法hasAuth判断menu中是否含有菜单项，有则执行后续操作，显示权限显示菜单页面
+            if (this.hasAuth(item)) {
+                if (!item.children) {
+                    pre.push(
+                        <Item key={item.key}>
+                            <Link to={item.key}>
                                 <Icon type={item.icon} />
                                 <span>{item.title}</span>
-                            </span>
-                        }
-                    >
-                        {this.getMenuNodes2(item.children)}
-                    </SubMenu>
-                )
+                            </Link>
+                        </Item>
+                    )
+                } else {
+                    // 当前item的children中某个item的key与当前请求的path相同, 当前item的key就是openKey
+                    const cItem = item.children.find(cItem => path.indexOf(cItem.key)===0)
+                    if (cItem) {
+                        this.openKey = item.key
+                    }
+                    pre.push(
+                        <SubMenu
+                            key={item.key}
+                            title={
+                                <span>
+                                    <Icon type={item.icon} />
+                                    <span>{item.title}</span>
+                                </span>
+                            }
+                        >
+                            {this.getMenuNodes2(item.children)}
+                        </SubMenu>
+                    )
+                }
+                
+                return pre
             }
-            return pre
         }, [])
     }
 
@@ -90,7 +114,10 @@ class NavLeft extends Component {
     }
 
     render() {
-        const path = this.props.location.pathname
+        let path = this.props.location.pathname
+        if (path.indexOf('/product/')===0) {
+            path = '/product'
+        }
         console.log('path' ,path)
         return (
             <div className='nav-left'>

@@ -3,6 +3,7 @@ import React from 'react'
 import { Upload, Icon, Modal, message } from 'antd';
 import { reqDelPicture } from './../../../api'
 import { IMG_BASE_URL } from './../../../utils/constants'
+import './picture-wall.less'
 
 function getBase64(file) {
   return new Promise((resolve, reject) => {
@@ -44,7 +45,7 @@ export default class PicturesWall extends React.Component {
 
   // 当进行文件上传/删除时, 文件状态发生改变时调用
   handleChange = async({ file, fileList }) => {
-    console.log('file', file, file.status, file === fileList[fileList.length - 1])
+    // console.log('file', file, file.status, file === fileList[fileList.length - 1])
     if (file.status === 'done') {
       const {name,url} = file.response.data   //响应数据的name，url是数据的真正name，url,不是base64编译出的
       file = fileList[fileList.length - 1]    //改变file的name和url并不是真正改变了，需改变fileList的name和url
@@ -92,7 +93,7 @@ export default class PicturesWall extends React.Component {
       </div>
     );
     return (
-      <div className="clearfix">
+      <div>
         <Upload
           action = "/manage/img/upload"
           listType="picture-card"
