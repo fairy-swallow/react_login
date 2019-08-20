@@ -1,14 +1,15 @@
 import React, { Component } from 'react'
 import { Card, Button, Table, Modal, message } from "antd";
+import { connect } from "react-redux";
 
 import { reqgetRole, reqAddRole, reqUpdateRole } from "./../../api";
 import { formateDate } from './../../utils/dateUtil'
 import ButtonLink from './../../components/button-link/buttonLink'
 import RoleForm from "./role-form";
 import Auth from './auth'
-import memoryUtils from './../../utils/memoryUtil'
+// import memoryUtils from './../../utils/memoryUtil'
 
-export default class Role extends Component {
+class Role extends Component {
   // state = {
   //   roles: [],
   //   isShowAdd: false,
@@ -101,7 +102,8 @@ export default class Role extends Component {
     const role = this.role
     role.menus = this.refs.authRef.getMenus()
     role.auth_time = Date.now()
-    role.auth_name = memoryUtils.user.username
+    // role.auth_name = memoryUtils.user.username
+    role.auth_name = this.props.user.username
     const result = await reqUpdateRole(role)
     if (result.status === 0) {
       message.success('授权成功')
@@ -158,3 +160,10 @@ export default class Role extends Component {
     )
   }
 }
+
+export default connect(
+  state =>({
+    user: state.user
+  }),
+  {}
+)(Role)

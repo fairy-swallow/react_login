@@ -1,13 +1,16 @@
 import React,{Component} from 'react'
-import { Form, Icon, Input, Button,message } from 'antd';
+import { Form, Icon, Input, Button /*,message*/ } from 'antd';
 import { Redirect } from 'react-router-dom'
+import { connect } from "react-redux";
 
-import { saveUser } from "./../../utils/storageUtil";
-import { reqLogin } from './../../api'
+// import { saveUser } from "./../../utils/storageUtil";
+// import { reqLogin } from './../../api'
+import { login } from "./../../redux/actions";
 
 import './login.less'
 import logo from './../../assets/images/logo.png'
-import memoryUtil from "../../utils/memoryUtil";
+// import memoryUtil from "../../utils/memoryUtil";
+
 
 
  class Login extends Component {
@@ -20,6 +23,7 @@ import memoryUtil from "../../utils/memoryUtil";
         // console.log(value,user,password)
         this.props.form.validateFields(async(err, values) => {
             if (!err) {
+                /*
                 //   alert('点击发送登录的ajax请求')
                 // console.log(values)
                 const result = await reqLogin(values)
@@ -37,6 +41,8 @@ import memoryUtil from "../../utils/memoryUtil";
                 }else{
                     message.error(result.msg)
                 }
+                */
+                this.props.login(values.username,values.password)
             }
           });
     
@@ -59,7 +65,9 @@ import memoryUtil from "../../utils/memoryUtil";
 
 
     render() {
-        if(memoryUtil.user._id){
+        const user = this.props.user
+        /* if(memoryUtil.user._id){ */
+        if(user._id){
             return <Redirect to='/' />
         }
         const Item = Form.Item
@@ -71,6 +79,7 @@ import memoryUtil from "../../utils/memoryUtil";
                    <h1>后台管理系统</h1>
                </header>
                <div className='login-content'>
+                   <div style={{color:'red'}}>{user.msg}</div>
                    <h1>用户登录</h1>
                    <Form onSubmit={this.handleSubmit} className="login-form">
                         <Item>
@@ -112,4 +121,9 @@ import memoryUtil from "../../utils/memoryUtil";
 }
 
 const WrappedLoginForm = Form.create()(Login);
-export default WrappedLoginForm
+export default connect(
+    state =>({
+        user:state.user
+    }),
+    { login }
+)(WrappedLoginForm)

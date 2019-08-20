@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { Redirect,Switch,Route } from 'react-router-dom'
 import { Layout } from 'antd';
+import { connect } from "react-redux";
 
-
-import memoryUtil from "../../utils/memoryUtil";
+// import memoryUtil from "../../utils/memoryUtil";
 import Header from "./../../components/header";
 import NavLeft from "./../../components/nav-left";
 
@@ -19,9 +19,11 @@ import Pie from "./../charts/chartpie";
 
 const { Footer, Sider, Content } = Layout;
 
-export default class Admin extends Component {
+class Admin extends Component {
     render() {
-        if (!memoryUtil.user._id) {
+        const user = this.props.user
+        // if (!memoryUtil.user._id) {
+        if (!user._id) {
             return <Redirect to='/login' />
         }
         return (
@@ -51,3 +53,10 @@ export default class Admin extends Component {
         )
     }
 }
+ 
+export default connect(
+    state =>({
+        user: state.user
+    }),
+    {}
+)(Admin)

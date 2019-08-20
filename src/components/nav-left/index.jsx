@@ -4,15 +4,18 @@ import { Link,withRouter } from "react-router-dom";
 
 import mnueList from "./../../config/menuconfig";
 import logo from "./../../assets/images/logo.png";
-import memoryUtil from "./../../utils/memoryUtil";
+// import memoryUtil from "./../../utils/memoryUtil";
 import "./nav-left.less";
+import { connect } from "react-redux";
+import { setHeaderTitle } from "./../../redux/actions";
 
 const { SubMenu, Item } = Menu
 
 class NavLeft extends Component {
 
     hasAuth= (item)=>{
-        const user = memoryUtil.user
+        // const user = memoryUtil.user
+        const user = this.props.user
         const menus = user.role.menus
         // 1.判断用户是否为admin
         // 2.判断menuList中是否isPublic为true
@@ -33,9 +36,13 @@ class NavLeft extends Component {
             // 自定义一个方法hasAuth判断menu中是否含有菜单项，有则执行后续操作，显示权限显示菜单页面
             if (this.hasAuth(item)) {
                 if (!item.children) {
+                    // 如果请求的路径与当前item的key一致, 将当前item的title更新到redux的状态
+                    if (path.indexOf(item.key) === 0) {
+                        this.props.setHeaderTitle(item.title)
+                    }
                     return (
                         <Item key={item.key}>
-                            <Link to={item.key}>
+                            <Link to={item.key} onClick={() => this.props.setHeaderTitle(item.title)}>
                                 <Icon type={item.icon} />
                                 <span>{item.title}</span>
                             </Link>
@@ -68,12 +75,16 @@ class NavLeft extends Component {
     getMenuNodes2 = (mnueList) => {
         const path = this.props.location.pathname
         return mnueList.reduce((pre, item) => {
+            // 如果请求的路径与当前item的key一致, 将当前item的title更新到redux的状态
+            if (path.indexOf(item.key) === 0) {
+                this.props.setHeaderTitle(item.title)
+            }
             // 自定义一个方法hasAuth判断menu中是否含有菜单项，有则执行后续操作，显示权限显示菜单页面
             if (this.hasAuth(item)) {
                 if (!item.children) {
                     pre.push(
                         <Item key={item.key}>
-                            <Link to={item.key}>
+                            <Link to={item.key} onClick={() => this.props.setHeaderTitle(item.title)}>
                                 <Icon type={item.icon} />
                                 <span>{item.title}</span>
                             </Link>
@@ -143,4 +154,10 @@ class NavLeft extends Component {
 }
 
 // withRouter: 高阶组件: 包装非路由组件返回一个包装后的新组件, 新组件会向被包装组件传递history/location/match属性
-export default withRouter(NavLeft)
+// export default withRouter(NavLeft)
+export default connect(
+    state =>({
+        user: state.user
+    }),
+    { setHeaderTitle }
+)(withRouter(NavLeft))

@@ -1,14 +1,15 @@
 import React, { Component } from 'react'
 import { Modal } from 'antd';
 import { withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
 
 import { reqWeather } from "./../../api/index";
 import { formateDate } from "./../../utils/dateUtil";
-import menuList from "./../../config/menuconfig";
-import memoryUtil from "./../../utils/memoryUtil";
-import { saveUser, removeUser } from "./../../utils/storageUtil";
+// import memoryUtil from "./../../utils/memoryUtil";
+// import { removeUser } from "./../../utils/storageUtil";
 import ButtonLink from "./../button-link/buttonLink";
 import './header.less'
+import { resetLogin } from "./../../redux/actions";
 
 const { confirm } = Modal;
 
@@ -25,11 +26,14 @@ class Header extends Component {
         confirm({
             title: '确认退出吗？',
             onOk: () => {    //注意使用箭头函数
+                /*
                 // 设置local中的数据为空，（删除）
                 // saveUser({})
                 removeUser()
                 memoryUtil.user = {}
                 this.props.history.replace('/login')
+                */
+                this.props.resetLogin()
             },
             onCancel: () => {   //注意使用箭头函数
                 console.log('Cancel');
@@ -38,6 +42,7 @@ class Header extends Component {
     }
 
     // 获取content页面的title
+    /*
     getTitle = () => {
         let title = ''
         const path = this.props.location.pathname
@@ -53,6 +58,7 @@ class Header extends Component {
         })
         return title
     }
+    */
 
     // 更新时间
     updateTime=()=>{
@@ -84,8 +90,12 @@ class Header extends Component {
 
     render() {
         const { currentTime, dayPictureUrl, weather } = this.state
-        let title = this.getTitle()
-        const user = memoryUtil.user
+        // let title = this.getTitle()
+        // 通过redux获取title
+        const title = this.props.headerTitle
+
+        // const user = memoryUtil.user
+        const user = this.props.user
         return (
             <div className='header'>
                 <div className='header-top'>
@@ -106,4 +116,11 @@ class Header extends Component {
     }
 }
 
-export default withRouter(Header)
+// export default withRouter(Header)
+export default connect(
+    state =>({
+        headerTitle: state.headerTitle,
+        user:state.user
+    }),
+    { resetLogin }
+)(withRouter(Header))
