@@ -29,7 +29,7 @@ function user(state = inituser, action) {
       return action.data
     case SHOW_MSG:
       return {...state, msg: action.data}
-      case RESET_LOGIN:
+    case RESET_LOGIN:
       return {msg:'请重新登陆'}
     default:
       return state

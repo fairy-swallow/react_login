@@ -26,7 +26,7 @@ const showMsg = (msg) =>({type: SHOW_MSG,data: msg})
 // 登陆的异步action
 export function login(username,password) {
   return async dispatch =>{
-    const result = await reqLogin(username,password)
+    const result = await reqLogin({username,password})
     if (result.status === 0) {
       const user = result.data
       saveUser(user)
